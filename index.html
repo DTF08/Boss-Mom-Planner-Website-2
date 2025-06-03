@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boss Mom Planner</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#8B4B6B">
+    <meta name="description" content="A comprehensive planner for busy moms to organize their daily life, schedules, and tasks">
+    
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Boss Mom Planner">
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+
+    <!-- Standard Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16x16.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' };</script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/main.min.js"></script>
+    
+    <!-- Google API for Sheets Integration -->
+    <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body class="text-[var(--text-light)] dark:text-[var(--text-dark)] p-4 selection:bg-[var(--primary-light)] selection:text-[var(--primary-dark)] font-sans">
+    <div class="max-w-6xl mx-auto">
+        <!-- Embedded interactive calendar -->
+        <div id="calendar" class="mb-8"></div>
+
+        <header class="flex flex-col sm:flex-row items-center justify-between mb-8 px-6 py-4 rounded-xl shadow-lg bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-light)] text-white"> <!--  Increased padding/rounding  -->
+            <div class="flex items-center gap-3 mb-3 sm:mb-0">
+                 <!--  Changed Icon  -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-[var(--accent)] hover:scale-110 transition-transform">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <h1 class="text-3xl font-bold tracking-tight drop-shadow">Boss Mom Planner</h1> <!--  Adjusted font  -->
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="helpBtn" type="button" title="Show Help" aria-label="Show Help" class="p-2 rounded-full text-white hover:bg-white/25 transition-colors"> <!--  Increased hover opacity  -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                </button>
+                <button id="themeToggle" type="button" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--accent)] text-[var(--primary-dark)] font-semibold shadow hover:bg-yellow-300 transition-colors"> <!--  Updated colors  -->
+                    <span id="themeLabel">Light Mode</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="mb-8 p-4 bg-white dark:bg-gray-800 rounded-xl shadow"> <!--  Increased rounding/margin  -->
+            <label for="overallProgress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Overall Progress:</label>
+            <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3 overflow-hidden"> <!--  Slightly thinner  -->
+                <div id="progressBar" class="bg-[var(--primary-dark)] dark:bg-[var(--secondary)] h-3 rounded-full transition-all duration-300 ease-out" style="width: 0%;"></div> <!--  Updated colors  -->
+            </div>
+            <span id="progressText" class="text-xs text-gray-600 dark:text-gray-400 mt-1 block text-center">0% Complete</span>
+            <div class="mt-3 flex justify-center gap-3">
+                <button id="expandAllBtn" type="button" class="px-3 py-1 bg-gray-200 dark:bg-gray-600 text-xs rounded-full hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">Expand All</button> <!--  Rounded  -->
+                <button id="collapseAllBtn" type="button" class="px-3 py-1 bg-gray-200 dark:bg-gray-600 text-xs rounded-full hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">Collapse All</button> <!--  Rounded  -->
+            </div>
+        </div>
+
+        <!-- Planner Management -->
+        <div class="mb-8 p-5 bg-white dark:bg-gray-800 rounded-xl shadow"> <!--  Increased rounding/padding/margin  -->
+            <h2 class="text-xl font-semibold mb-4 border-b dark:border-gray-700 pb-2 text-[var(--primary-dark)] dark:text-[var(--primary-light)]">Planner Management</h2> <!--  Colored heading  -->
+            
+            <!-- Search and Load -->
+            <div class="flex flex-col gap-4 mb-5"> <!--  Increased margin  -->
+                <div class="flex flex-wrap gap-4 items-end">
+                    <div class="flex-grow">
+                        <label for="searchPlannerInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search Planners:</label>
+                        <input type="text" id="searchPlannerInput" placeholder="Type to filter..." class="w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-[var(--primary-light)] dark:focus:ring-[var(--accent)] focus:ring-opacity-50 focus:border-transparent outline-none"> <!--  Updated focus rings  -->
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-4 items-end">
+                    <div class="flex-grow">
+                        <label for="plannerSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Load Saved Planner:</label>
+                        <select id="plannerSelect" class="w-full border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-[var(--primary-light)] dark:focus:ring-[var(--accent)] focus:ring-opacity-50 focus:border-transparent outline-none"> <!--  Updated focus rings  -->
+                            <option value="">-- New Planner --</option>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3"> <!--  Adjusted grid, gap  -->
+<button id="saveAsNewBtn" type="button" class="cmdBtn bg-[var(--accent)] hover:bg-[var(--primary-light)] text-[var(--text-dark)] text-sm" data-original-text="Save As New">
+                    <span>Save As New</span>
+                </button>
+<button id="duplicatePlannerBtn" type="button" class="cmdBtn bg-[var(--secondary)] hover:bg-[var(--primary-dark)] text-[var(--text-light)] text-sm" data-original-text="Duplicate">
+                    <span>Duplicate</span>
+                </button>
+<button id="deletePlannerBtn" type="button" class="cmdBtn bg-[var(--primary-dark)] hover:bg-[var(--secondary)] text-[var(--text-light)] text-sm" data-original-text="Delete">
+                    <span>Delete</span>
+                </button>
+<button id="clearCurrentBtn" type="button" class="cmdBtn bg-[var(--secondary)] hover:bg-[var(--primary-dark)] text-[var(--text-light)] text-sm" data-original-text="Clear Form">
+                    <span>Clear Form</span>
+                </button>
+<button id="exportJsonBtn" type="button" class="cmdBtn bg-[var(--accent)] hover:bg-[var(--primary-light)] text-[var(--text-dark)] text-sm" data-original-text="Export JSON">
+                    <span>Export JSON</span>
+                </button>
+            </div>
+            
+            <!-- Auto-save indicator -->
+            <div class="mt-4 text-right"> <!--  Increased margin  -->
+                <span id="autoSaveIndicator" class="text-xs text-gray-500 dark:text-gray-400 flex items-center justify-end opacity-0 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <!--  Added pulse  -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Auto-saving...
+                </span>
+            </div>
+        </div>
+
+        <div class="mb-8 flex flex-wrap gap-x-6 gap-y-4 items-center p-5 bg-white dark:bg-gray-800 rounded-xl shadow"> <!--  Increased rounding/padding/margin  -->
+            <div class="flex items-center gap-2">
+                <label for="dateInput" class="font-medium text-gray-700 dark:text-gray-300">Date:</label>
+                <input id="dateInput" type="date" aria-label="Planner Date" class="border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 track focus:ring-2 focus:ring-[var(--primary-light)] dark:focus:ring-[var(--accent)] focus:border-transparent outline-none"> <!--  Updated focus rings  -->
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="byInput" class="font-medium text-gray-700 dark:text-gray-300">Your Name:</label>
+                <input id="byInput" type="text" placeholder="Your name" aria-label="Your Name" class="border border-gray-300 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600 track focus:ring-2 focus:ring-[var(--primary-light)] dark:focus:ring-[var(--accent)] focus:border-transparent outline-none"> <!--  Updated focus rings  -->
+            </div>
+        </div>
+
+        <!-- Planner Sections -->
+        <div class="space-y-8" id="plannerWrapper"> <!--  Increased spacing  -->
+            <!-- Sections will be populated by JavaScript -->
+        </div>
+
+        <div class="flex flex-wrap gap-4 mt-10 p-5 bg-white dark:bg-gray-800 rounded-xl shadow"> <!--  Increased rounding/padding/margin  -->
+            <button id="saveBtn" type="button" class="cmdBtn bg-[var(--primary-dark)] hover:bg-[var(--primary-light)] hover:text-[var(--primary-dark)] text-white" data-original-text="Save Current"> <!--  Updated colors  -->
+                <span>Save Current</span>
+            </button>
+            <button id="exportBtn" type="button" class="cmdBtn bg-[var(--accent)] hover:bg-yellow-300 text-[var(--primary-dark)]" data-original-text="Export JSON"> <!--  Updated colors  -->
+                <span>Export JSON</span>
+            </button>
+            <button id="importJsonBtn" type="button" class="cmdBtn bg-[var(--secondary)] hover:bg-[var(--primary-light)] text-[var(--text-light)]" data-original-text="Import JSON">
+                <span>Import JSON</span>
+            </button>
+            <input type="file" id="importFileInput" accept=".json" style="display: none;">
+            <button id="printBtn" type="button" class="cmdBtn bg-[var(--secondary)] hover:bg-green-300 text-[var(--primary-dark)]" data-original-text="Print Planner"> <!--  Updated colors  -->
+                <span>Print Planner</span>
+            </button>
+            <button id="clearBtn" type="button" class="cmdBtn bg-gray-400 hover:bg-gray-500 text-white" data-original-text="Clear All Data"> <!--  Adjusted color  -->
+                <span>Clear All Data</span>
+            </button>
+        </div>
+
+        <!-- Google Sheets Integration Section -->
+        <div class="mt-8 p-5 bg-white dark:bg-gray-800 rounded-xl shadow">
+            <h3 class="text-lg font-semibold mb-4 text-[var(--primary-dark)] dark:text-[var(--primary-light)] flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-green-600">
+                    <path d="M19 11h-6V5h6m0-2h-8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m-9 2V5a2 2 0 0 0-2-2H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5V11h2m-7 4h4v2H3v-2m0-4h4v2H3V9m0-4h4v2H3V5Z"/>
+                </svg>
+                Google Sheets Integration
+            </h3>
+            <div class="flex flex-wrap gap-4 items-center">
+                <span id="authenticationStatus" class="hidden text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Connected to Google
+                </span>
+                <button id="authorizeButton" type="button" class="cmdBtn bg-blue-600 hover:bg-blue-700 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Connect Google Sheets
+                </button>
+                <button id="syncGoogleSheetsBtn" type="button" class="cmdBtn bg-green-600 hover:bg-green-700 text-white" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Export to Sheets
+                </button>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-3">
+                Connect your Google account to export your planner data to Google Sheets for advanced analysis and sharing.
+            </p>
+        </div>
+
+        <p id="statusMsg" class="text-sm mt-4 h-5 text-gray-600 dark:text-gray-400 inline-flex items-center gap-1.5" aria-live="polite"></p> <!--  Increased margin  -->
+    </div>
+
+    <!-- Help Modal -->
+    <dialog id="helpModal" class="p-0 rounded-xl shadow-xl max-w-lg w-[90%] backdrop:bg-black/50 dark:bg-gray-800 dark:text-[var(--text-dark)]"> <!--  Increased rounding  -->
+        <header class="flex justify-between items-center p-4 border-b dark:border-gray-700">
+            <h2 class="text-xl font-semibold">Planner Instructions</h2>
+            <button id="closeHelpBtn" type="button" aria-label="Close Help" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </header>
+        <div class="p-6 space-y-4 text-sm">
+            <p>Welcome to the Boss Mom Planner!</p>
+            <ul class="list-disc list-inside space-y-1">
+                <li>Fill in the <strong>Date</strong> and <strong>Your Name</strong> fields.</li>
+                <li>Expand each <strong>Section</strong> by clicking on its title.</li>
+                <li>Use the checkboxes, text fields, and tables to plan your schedule.</li>
+                <li>Use the <strong class="text-[var(--primary-dark)] dark:text-[var(--accent)]">Add Entry/Row</strong> buttons to add new items to tables.</li>
+                <li>Your progress is automatically saved to your browser's local storage.</li>
+                <li>Use <strong>Save Current</strong> to manually save your work.</li>
+                <li>Use <strong>Export JSON</strong> to download your planner as a backup file.</li>
+                <li>Use <strong>Import JSON</strong> to load a previously saved planner file.</li>
+                <li>Use <strong>Print Planner</strong> to print a physical copy.</li>
+                <li>Use <strong>Clear All Data</strong> to reset the planner (requires confirmation).</li>
+                <li>Use the button in the header to toggle between <strong>Light</strong> and <strong>Dark</strong> themes.</li>
+            </ul>
+            <p>Progress is indicated by the colored dot next to each section title (Red: Not Started, Yellow: In Progress, Green: Complete) and the overall progress bar at the top.</p>
+        </div>
+        <footer class="p-4 border-t dark:border-gray-700 text-right">
+            <button id="okHelpBtn" type="button" class="cmdBtn bg-[var(--primary-dark)] hover:bg-[var(--primary-light)] hover:text-[var(--primary-dark)] text-white text-sm">OK</button> <!--  Updated style/colors  -->
+        </footer>
+    </dialog>
+
+
+    <!-- Google Sheets Authentication Modal -->
+    <dialog id="authModal" class="p-0 rounded-xl shadow-xl max-w-md w-[90%] backdrop:bg-black/50 dark:bg-gray-800 dark:text-[var(--text-dark)]">
+        <header class="flex justify-between items-center p-4 border-b dark:border-gray-700">
+            <h2 class="text-xl font-semibold">Google Sheets Authentication</h2>
+            <button id="closeAuthModalBtn" type="button" aria-label="Close Modal" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </header>
+        <div class="p-6 space-y-4 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor" class="mx-auto text-red-500">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            <p class="text-gray-600 dark:text-gray-400">
+                Please sign in with your Google account to enable Google Sheets integration.
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-500">
+                This will allow you to export your planner data directly to Google Sheets.
+            </p>
+        </div>
+        <footer class="p-4 border-t dark:border-gray-700 text-center">
+            <button id="closeAuthBtn" type="button" class="cmdBtn bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm">Close</button>
+        </footer>
+    </dialog>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+
+    <!-- Main scripts -->
+    <script src="script.js" defer></script>
+    <script src="google-sheets.js" defer></script>
+</body>
+</html>

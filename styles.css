@@ -1,0 +1,646 @@
+/* Define CSS variables for colors - Boss Mom Planner Theme */
+:root {
+    --primary-dark: #8B4B6B;  /* Rich rose/mauve */
+    --primary-light: #E8C5D1; /* Soft pink blush */
+    --accent: #F4A261;        /* Warm gold/coral */
+    --secondary: #A67C8A;     /* Muted rose */
+    --text-light: #2D1B2E;    /* Deep plum text for light mode */
+    --text-dark: #F5F1F3;     /* Light rose text for dark mode */
+    --wave: rgba(244, 162, 97, .05); /* Subtle warm wave background */
+    --success: #7C9885;       /* Sage green for success states */
+    --warning: #E8B86D;       /* Warm amber for warnings */
+    --error: #C77B7B;         /* Soft red for errors */
+
+    /* Modern Gradients */
+    --gradient-primary: linear-gradient(135deg, #8B4B6B 0%, #E8C5D1 100%);
+    --gradient-accent: linear-gradient(135deg, #F4A261 0%, #E8B86D 100%);
+    --gradient-success: linear-gradient(135deg, #7C9885 0%, #A8C4B0 100%);
+    --gradient-warm: linear-gradient(135deg, #E8C5D1 0%, #F4A261 100%);
+
+    /* Glassmorphism Variables */
+    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    --glass-blur: blur(12px);
+    
+    /* Animation Timing */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+html.dark {
+    --glass-bg: rgba(40, 40, 40, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Base body styles with smooth transitions */
+html.light body {
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    background-attachment: fixed;
+    color: var(--text-light);
+    transition: all var(--transition-normal);
+}
+
+html.dark body {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    background-attachment: fixed;
+    color: var(--text-dark);
+    transition: all var(--transition-normal);
+}
+
+body {
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    min-height: 100vh;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    position: relative;
+}
+
+/* Animated Background Pattern */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(244, 162, 97, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 75, 107, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(232, 197, 209, 0.1) 0%, transparent 50%);
+    z-index: -1;
+    animation: backgroundShift 20s ease infinite;
+}
+
+@keyframes backgroundShift {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(-20px, -20px) rotate(1deg); }
+    66% { transform: translate(20px, -10px) rotate(-1deg); }
+}
+
+/* Typography with modern styling */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+/* Modern Header with Glassmorphism */
+header {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur) saturate(180%);
+    -webkit-backdrop-filter: var(--glass-blur) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: all var(--transition-normal);
+}
+
+header h1 {
+    -webkit-text-fill-color: var(--text-dark);
+    text-fill-color: var(--text-dark);
+}
+
+/* Status Badge Animation */
+.status-badge {
+    margin-left: 0.5rem;
+    font-size: 1.1rem;
+    display: inline-block;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    transition: all var(--transition-fast);
+}
+
+.status-red { 
+    color: var(--error);
+    filter: drop-shadow(0 0 8px rgba(199, 123, 123, 0.5));
+}
+.status-amber { 
+    color: var(--warning);
+    filter: drop-shadow(0 0 8px rgba(232, 184, 109, 0.5));
+}
+.status-green { 
+    color: var(--success);
+    filter: drop-shadow(0 0 8px rgba(124, 152, 133, 0.5));
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% { 
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+/* Modern Card Styles with Glassmorphism */
+#plannerWrapper > details {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur) saturate(180%);
+    -webkit-backdrop-filter: var(--glass-blur) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-lg);
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+    transition: all var(--transition-normal);
+    transform: translateY(0);
+    position: relative;
+    overflow: hidden;
+}
+
+#plannerWrapper > details::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    transform: rotate(45deg);
+    transition: all var(--transition-slow);
+    opacity: 0;
+}
+
+#plannerWrapper > details:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+#plannerWrapper > details:hover::before {
+    opacity: 1;
+}
+
+/* Summary Styling with Hover Effects */
+summary {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    padding: 1rem 1.5rem;
+}
+
+summary::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--gradient-accent);
+    transition: width var(--transition-normal);
+}
+
+summary:hover::after {
+    width: 100%;
+}
+
+/* Modern Button Styles */
+.cmdBtn {
+    position: relative;
+    overflow: hidden;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    background: var(--gradient-primary);
+    background-size: 200% auto;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all var(--transition-normal);
+    transform: translateY(0);
+}
+
+.cmdBtn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.cmdBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background-position: right center;
+}
+
+.cmdBtn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.cmdBtn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Ripple Effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-animation 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Modern Input Styles with Floating Labels */
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select {
+    width: 100%;
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--glass-border);
+    transition: all var(--transition-normal);
+    font-size: 1rem;
+}
+
+.input-group label {
+    position: absolute;
+    top: 1rem;
+    left: 0.5rem;
+    color: var(--text-light);
+    transition: all var(--transition-normal);
+    pointer-events: none;
+}
+
+.input-group input:focus,
+.input-group textarea:focus,
+.input-group select:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+}
+
+.input-group input:focus ~ label,
+.input-group input:not(:placeholder-shown) ~ label,
+.input-group textarea:focus ~ label,
+.input-group textarea:not(:placeholder-shown) ~ label {
+    top: -0.5rem;
+    font-size: 0.8rem;
+    color: var(--accent);
+}
+
+/* Modern Checkbox Styles */
+input[type="checkbox"] {
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: var(--glass-bg);
+    border: 2px solid var(--glass-border);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition-fast);
+}
+
+input[type="checkbox"]:checked {
+    background: var(--gradient-success);
+    border-color: transparent;
+}
+
+input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    color: white;
+    font-weight: bold;
+    animation: checkmark 0.3s var(--transition-bounce) forwards;
+}
+
+@keyframes checkmark {
+    to {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* Progress Bar Animation */
+#progressBar {
+    background: var(--gradient-success);
+    height: 0.5rem;
+    border-radius: 0.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: width var(--transition-slow);
+}
+
+#progressBar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Skeleton Loading Animation */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Table Styles with Hover Effects */
+.table-wrapper {
+    overflow-x: auto;
+    margin: 1rem 0;
+    border-radius: 0.5rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-md);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    transition: all var(--transition-fast);
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--glass-border);
+    transition: all var(--transition-fast);
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.01);
+}
+
+/* Tips Box with Animation */
+.tips-box {
+    background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+    border-left: 4px solid var(--warning);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Modern Toggle Switch */
+.toggle-switch {
+    position: relative;
+    width: 3rem;
+    height: 1.5rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: white;
+    border-radius: 50%;
+    top: 0.125rem;
+    left: 0.125rem;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+}
+
+.toggle-switch.active {
+    background: var(--gradient-success);
+    border-color: transparent;
+}
+
+.toggle-switch.active::after {
+    left: calc(100% - 1.375rem);
+}
+
+/* Floating Action Button */
+.fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--gradient-accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    z-index: 50;
+}
+
+.fab:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: var(--shadow-xl);
+}
+
+/* Dialog Modal with Animation */
+dialog {
+    border: none;
+    border-radius: 1rem;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-xl);
+    padding: 0;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow: auto;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+dialog[open] {
+    animation: dialogOpen 0.3s ease-out;
+}
+
+@keyframes dialogOpen {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Smooth Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--glass-bg);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gradient-primary);
+    border-radius: 10px;
+    transition: all var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gradient-accent);
+}
+
+/* Focus States with Animation */
+*:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+    transition: all var(--transition-fast);
+}
+
+/* Add to Buttons */
+#saveBtn::after,
+#exportJsonBtn::after {
+    content: '✓';
+    position: absolute;
+    right: -2rem;
+    opacity: 0;
+    transition: all var(--transition-normal);
+}
+
+#saveBtn.success::after,
+#exportJsonBtn.success::after {
+    opacity: 1;
+    right: 1rem;
+}
+
+/* Theme Toggle Animation */
+#themeToggle {
+    background: var(--gradient-warm);
+    transition: all var(--transition-normal);
+}
+
+#themeToggle:hover {
+    transform: translateY(-2px) scale(1.05);
+}
+
+#themeToggle svg {
+    transition: transform var(--transition-normal);
+}
+
+#themeToggle:hover svg {
+    transform: rotate(180deg);
+}
+
+/* Notification Toast */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    padding: 1rem 2rem;
+    border-radius: 2rem;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transition: all var(--transition-normal);
+    z-index: 200;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* Print Styles - Keep existing */
+@media print {
+    body {
+        padding: 0;
+        margin: 0;
+        font-size: 10pt;
+    }
+    header, .cmdBtn, #themeToggle, #helpBtn, #saveBtn, #exportBtn, #clearBtn, #statusMsg, .delete-row-btn, .tips-box, #progressBar, #progressText, label[for="overallProgress"], dialog {
+        display: none !important;
+    }
+    /* ... rest of print styles ... */
+}
