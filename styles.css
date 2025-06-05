@@ -42,6 +42,10 @@ html.dark {
     --glass-shadow: 0 8px 32px 0 rgba(255, 255, 255, 0.05);
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 /* Base body styles with smooth transitions */
 html.light body {
     background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
@@ -643,4 +647,14 @@ dialog[open] {
         display: none !important;
     }
     /* ... rest of print styles ... */
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

@@ -507,14 +507,22 @@
     }
     
     function initializeTheme() {
-        let preference = false;
+        let storedPref = null;
         try {
-            const storedPref = localStorage.getItem(LOCAL_STORAGE_THEME_KEY);
-            if (storedPref !== null) preference = storedPref === 'true';
+            storedPref = localStorage.getItem(LOCAL_STORAGE_THEME_KEY);
         } catch (e) {
             console.error("Failed to read theme preference:", e);
         }
-        setTheme(preference);
+        const isDark = storedPref !== null ?
+            storedPref === 'true' :
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        setTheme(isDark);
+
+        if (storedPref === null) {
+            const mq = window.matchMedia('(prefers-color-scheme: dark)');
+            mq.addEventListener('change', (e) => setTheme(e.matches));
+        }
     }
 
     // --- Utility Functions ---
