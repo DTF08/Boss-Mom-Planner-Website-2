@@ -74,6 +74,8 @@ planner-website/
 - **Offline Ready**: Works without internet connection
 - **Native Feel**: Looks and feels like a native app
 - **Fast Loading**: Cached for quick startup
+- **Theme Aware**: Adapts to your device's light or dark mode
+- **Smooth Scroll**: Modern smooth-scrolling navigation
 
 ### 📱 iPhone Specific Features
 - **Full Screen**: Runs without Safari browser bars
